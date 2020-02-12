@@ -2,13 +2,16 @@ import { combineReducers } from 'redux'
 import { FETCH_ARTICLES, SET_ARTICLES, SET_COORDINATES } from '../types';
 import { Article, Coordinates } from '../../constants/types';
 
-const initialState = {
+const initialStateArticle = {
   fetchingArticles: false,
   articles: [] as Article[] | undefined,
+}
+
+const initialStateCoordinates = {
   coordinates: {lat: 0, lng: 0} as Coordinates,
 }
 
-function articleReducer(state = initialState, action: { type: string; payload?: Article[]; }) {
+function articleReducer(state = initialStateArticle, action: { type: string; payload?: Article[]; }) {
   switch(action.type) {
     case FETCH_ARTICLES:
       return {
@@ -27,7 +30,7 @@ function articleReducer(state = initialState, action: { type: string; payload?: 
   return state;
 }
 
-function coordinatesReducer(state = initialState, action: { type: string; payload: Coordinates}) {
+function coordinatesReducer(state = initialStateCoordinates, action: { type: string; payload: Coordinates}) {
   switch(action.type) {
     case SET_COORDINATES:
       return {
@@ -40,8 +43,6 @@ function coordinatesReducer(state = initialState, action: { type: string; payloa
 }
 
 export const rootReducer = combineReducers({
-  articleReducer,
-  coordinatesReducer
+  articles: articleReducer,
+  coordinates: coordinatesReducer
 });
-
-export type ReduxState = ReturnType<typeof rootReducer>

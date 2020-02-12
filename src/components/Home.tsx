@@ -53,7 +53,7 @@ class Home extends Component<HomeProps, {}> {
 
   render() {
     return(
-      <div className={'container-fluid'}>
+      <div className={'container-fluid'} style={{padding: 'none'}}>
         <ContentContainer>
           <div className={'col-12 col-md-8'}>
             <Map/>
@@ -69,7 +69,7 @@ class Home extends Component<HomeProps, {}> {
 
 const mapStateToProps = (state: any, ownProps?: HomeOwnProps) => {
   return {
-    coordinates: state.coordinates
+    coordinates: state.coordinates.coordinates
   }
 }
 

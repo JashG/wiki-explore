@@ -6,7 +6,10 @@ import Home from './components/Home';
 import { rootReducer } from './store/reducers/index';
 import './App.css';
 
-const store = createStore(rootReducer);
+const store = createStore(
+  rootReducer,
+  (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
+    (window as any).__REDUX_DEVTOOLS_EXTENSION__());
 
 const App: React.FC = () => {
   return (

@@ -2,19 +2,22 @@ import axios from 'axios';
 import { WIKI_API } from '../../endpoints/endpoints'
 
 type GeosearchParams = {
-  gscoord: String,
-  prop?: String,
+  gscoord: string,
+  gsradius?: number,
+  gslimit?: number,
+  prop?: string,
 }
 
 const defaultParams = {
   action: 'query',
   list: 'geosearch',
   format: 'json',
-  origin: '*'
+  origin: '*',
+  gsradius: 10000,
+  gslimit: 120
 }
 
 export const geosearch = (params: GeosearchParams) => {
-  console.log('called')
   const allParams = {
     ...defaultParams,
     ...params

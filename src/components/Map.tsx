@@ -35,7 +35,7 @@ interface MapDispatchProps {
 type MapProps = MapReduxProps & MapDispatchProps & MapOwnProps
 
 const MapContainer = styled.div`
-  height: 800px;
+  height: 600px;
   width: 100%;
 `
 
@@ -44,7 +44,15 @@ class Map extends Component<MapProps, MapState> {
   componentDidMount() {
     if (this.props.coordinates) {
       if (this.props.coordinates.lat !== 0 && this.props.coordinates.lng !== 0) {
-        this.generatePins()
+        // console.log(this.props.coordinates)
+      }
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.coordinates) {
+      if (this.props.coordinates.lat !== 0 && this.props.coordinates.lng !== 0) {
+        // console.log(this.props.coordinates)
       }
     }
   }
@@ -81,7 +89,7 @@ class Map extends Component<MapProps, MapState> {
 
 const mapStateToProps = (state: any, ownProps?: MapOwnProps) => {
   return {
-    coordinates: state.coordinates
+    coordinates: state.coordinates.coordinates
   }
 }
 
