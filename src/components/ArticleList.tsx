@@ -44,10 +44,6 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
   public geosearch = geosearch;
   public articleData = articleData;
 
-  constructor(props: ArticleProps) {
-    super(props);
-  }
-
   componentDidMount() {
     if (this.props.coordinates && this.props.coordinates.lat && this.props.coordinates.lng) {
       if (this.props.coordinates.lat !== 0 && this.props.coordinates.lng !== 0) {
@@ -82,6 +78,10 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
     }
 
     this.props.fetchArticlesAction();
+  
+    // If the number of provided articles (from the geosearch) exceeds 50,
+    // make API calls in parallel to retrieve each article's data
+    // Otherwise, we can get all of the articles' data with one call
     if (articles.length > MAX_PAGE_IDS) {
       console.log('over')
       this.handleArticleDataParallel(articles);
@@ -103,6 +103,7 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
     const apiCalls = articleChunks.map(async (chunk) => await this.getArticleData(chunk));
     const results = await Promise.all(apiCalls);
 
+    // Store article data we retrieved and put it in redux store
     const articleData: Article[] = []
     results.forEach((result: any) => {
       articleData.push(result);
@@ -112,9 +113,10 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
   }
 
   getArticleData = (articles: ArticleFromResponse[]) => {
+    // Array of articles we will store in redux
     const data: Article[] = [];
 
-    // Note: api call takes at most 50 page IDs
+    // Note: api call takes at most MAX_PAGE_IDS page IDs
     const pageIds = articles.map(article => article.pageid);
     const pageIdsString = pageIds.join('|'); // format provided as param to api
     const params = {
@@ -129,10 +131,13 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
         if (response.data.query.pages) {
           const articleData = response.data.query.pages;
 
+          // For each provided article, retrieve the article's data from the API response
           articles.forEach(article => {
-            const articleGeodata = articles.find(a => a.pageid == article.pageid);
+            const articleGeodata = articles.find(a => a.pageid === article.pageid);
             const lat = articleGeodata !== undefined ? articleGeodata.lat : 0;
             const lng = articleGeodata !== undefined ? articleGeodata.lon : 0;
+
+            // Push individual article's data
             data.push({
               id: article.pageid,
               title: article.title,
@@ -154,6 +159,8 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
 
   renderArticles = () => {
     const renderFragment: JSX.Element[] = [];
+
+    // For each article, create an article component
     if (this.props.articles) {
       this.props.articles.forEach(article => {
         if (article) {
@@ -162,6 +169,12 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
           )
         }
       });
+    } else {
+      return (
+        <div className="spinner-border" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      )
     }
 
     return renderFragment;

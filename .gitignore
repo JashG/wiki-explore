@@ -1,2 +1,8 @@
+# dependencies
 node_modules
+
+# temp
 temp/
+
+# development config
+webpack.config.js
