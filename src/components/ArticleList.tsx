@@ -10,19 +10,16 @@ import { Article as ArticleComponent } from '../components/Article';
 // Max page IDs that can be passed as param to articleData endpoint
 const MAX_PAGE_IDS = 50
 
-interface ArticleListState {
-  // none
-}
-
-// Define type of component's internal props
+// Define type of props from parent
 interface ArticleListOwnProps {
   // message: String
 }
 
-// Define type of data used in 'mapStateToProps' function
+// Define type of props we will pull from Redux store
 interface ArticleListReduxProps {
   coordinates: Coordinates,
-  articles: Article[]
+  articles: Article[],
+  fetchingArticles: boolean,
 }
 
 // Define type of functions used in 'mapDispatchToProps' function
@@ -31,14 +28,18 @@ interface ArticleListDispatchProps {
   fetchArticlesAction: () => void
 }
 
-type ArticleProps = ArticleListReduxProps & ArticleListDispatchProps & ArticleListOwnProps
+type Props = ArticleListReduxProps & ArticleListDispatchProps & ArticleListOwnProps
+
+interface State {
+  // none
+}
 
 const ArticleContainer = styled.div`
   height: 600px;
   overflow: scroll;
 `
 
-class ArticleList extends Component<ArticleProps, ArticleListState> {
+class ArticleList extends Component<Props, State> {
 
   // imported API calls
   public geosearch = geosearch;
@@ -52,7 +53,11 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
     }
   }
 
-  componentDidUpdate(prevProps: ArticleProps) {
+  componentDidUpdate(prevProps: Props) {
+    console.log("PREV: ")
+    console.log(prevProps)
+    console.log("CURR: ")
+    console.log(this.props)
     if (prevProps.coordinates.lat !== this.props.coordinates.lat || prevProps.coordinates.lng !== this.props.coordinates.lng) {
       this.handleGeosearch();
     }
@@ -67,7 +72,9 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
       if (response && response.data && response.data.query && response.data.query.geosearch) {
         this.handleArticleData(response.data.query.geosearch);
       }
-    });
+    }).catch(error => {
+      console.log(error)
+    })
   }
 
   handleArticleData = (articles: ArticleFromResponse[]) => {
@@ -79,11 +86,10 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
 
     this.props.fetchArticlesAction();
   
-    // If the number of provided articles (from the geosearch) exceeds 50,
-    // make API calls in parallel to retrieve each article's data
+    // If the number of provided articles (from the geosearch) exceeds
+    // MAX_PAGE_IDS, make API calls to get article data in parallel.
     // Otherwise, we can get all of the articles' data with one call
     if (articles.length > MAX_PAGE_IDS) {
-      console.log('over')
       this.handleArticleDataParallel(articles);
     } else {
       this.getArticleData(articles);
@@ -103,7 +109,7 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
     const apiCalls = articleChunks.map(async (chunk) => await this.getArticleData(chunk));
     const results = await Promise.all(apiCalls);
 
-    // Store article data we retrieved and put it in redux store
+    // Store article data we retrieved in redux
     const articleData: Article[] = []
     results.forEach((result: any) => {
       articleData.push(result);
@@ -127,8 +133,10 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
     }
 
     this.articleData(params).then(response => {
+      console.log(response)
       if (response && response.data && response.data.query) {
         if (response.data.query.pages) {
+          // Get article data from response
           const articleData = response.data.query.pages;
 
           // For each provided article, retrieve the article's data from the API response
@@ -153,15 +161,17 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
     }).then(onfulfilled => {
       this.props.setArticlesAction(data);
     }).catch(error => {
+      console.log(error)
       this.props.setArticlesAction([]);
     });
   }
 
   renderArticles = () => {
+    // We will store each ArticleComponent here
     const renderFragment: JSX.Element[] = [];
 
     // For each article, create an article component
-    if (this.props.articles) {
+    if (this.props.articles.length) {
       this.props.articles.forEach(article => {
         if (article) {
           renderFragment.push(
@@ -169,13 +179,15 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
           )
         }
       });
-    } else {
-      return (
-        <div className="spinner-border" role="status">
-          <span className="sr-only">Loading...</span>
-        </div>
-      )
     }
+    // } else if (this.props.fetchingArticles) {
+    //   console.log(this.props.fetchingArticles)
+    //   return (
+    //     <div className="spinner-border slow" role="status">
+    //       <span className="sr-only">Loading...</span>
+    //     </div>
+    //   )
+    // }
 
     return renderFragment;
   }
@@ -183,17 +195,19 @@ class ArticleList extends Component<ArticleProps, ArticleListState> {
   render() {
     return(
       <ArticleContainer>
+        <p>{this.props.coordinates ? this.props.coordinates.lat : 'Fuck'}</p>
         {this.renderArticles()}
-        <p>{this.props.coordinates ? this.props.coordinates.lat : ''}</p>
       </ArticleContainer>
     )
   }
 }
 
-const mapStateToProps = (state: any, ownProps?: ArticleListOwnProps) => {
+// Note: Type of 'state' should be interface for Redux state
+const mapStateToProps = (state: any, ownProps?: ArticleListOwnProps): ArticleListReduxProps => {
   return {
     coordinates: state.coordinates.coordinates,
-    articles: state.articles.articles
+    articles: state.articles.articles,
+    fetchingArticles: state.articles.fetchingArticles,
   }
 }
 

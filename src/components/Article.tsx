@@ -41,13 +41,13 @@ const ArticleCoordinates = styled.span`
   }
 `
 
-const ArticleImageContainer = styled.div`
-  width: 100px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`
+// const ArticleImageContainer = styled.div`
+//   width: 100px;
+//   overflow: hidden;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+// `
 
 const ArticleImage = styled.img`
   height: 100px;
