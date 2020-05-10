@@ -76,7 +76,7 @@ class Map extends Component<MapProps, MapState> {
     return(
       <MapContainer>
         <GoogleMapReact
-          bootstrapURLKeys={{ key: 'AIzaSyBSQKUX7ialx0RwFfXinne5OtzTiIsJR3E' }}
+          bootstrapURLKeys={{ key: '' }}
           defaultCenter={defaultProps.center}
           defaultZoom={defaultProps.zoom}
           yesIWantToUseGoogleMapApiInternals
