@@ -1,30 +1,38 @@
 import React, { Component } from 'react';
 import styled from 'styled-components'
 import { Article as ArticleType } from '../constants/types'
-import { LIGHT_GREY, SUBHEADING } from '../style/colors';
-import { LeftAlignDiv } from '../components/generic/components'
+import { LIGHT_GREY, SUBHEADING, PRIMARY_TEXT, PRIMARY_HOVER, SECONDARY_HOVER } from '../style/colors';
 
 // Max length of an article title we will display before clipping
 const MAX_TITLE_LEN = 35
 
 const ArticleContainer = styled.div`
-  height: 60px;
+  height: 70px;
   padding-left: 10px;
   display: flex;
   flex-direction: column;
   border-bottom: solid 2px ${LIGHT_GREY};
   transition: 0.2s ease-in;
+  color: ${PRIMARY_TEXT};
 
   &:hover {
-    color: 
+    border-bottom: solid 2px ${PRIMARY_HOVER};
   }
 `
 
 const ArticleTitle = styled.a`
+  text-align: left;
   padding-top: 10px;
   font-size: 18px;
-  text-align: left;
-  
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:visited {
+    color: inherit;
+  }
 
   @media (max-width: 767px) {
     font-size: 24px;
@@ -41,16 +49,30 @@ const ArticleCoordinates = styled.span`
   }
 `
 
-// const ArticleImageContainer = styled.div`
-//   width: 100px;
-//   overflow: hidden;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-// `
+const OptionsContainer = styled.div`
+  padding-top: 6px;
 
-const ArticleImage = styled.img`
-  height: 100px;
+  &:hover {
+    
+  }
+`
+
+const Option = styled.span`
+  font-size: 14px;
+  text-align: left;
+  padding: 2px;
+  color: ${PRIMARY_TEXT};
+  transition: 0.2s ease-in-out;
+
+  &:hover {
+    border-radius: 4px;
+    background: ${SECONDARY_HOVER};
+    cursor: pointer;
+  }
+
+  @media (max-width: 767px) {
+    font-size: 18.5px;
+  }
 `
 
 interface ArticleProps {
@@ -58,14 +80,6 @@ interface ArticleProps {
 }
 
 export class Article extends Component<ArticleProps, {}> {
-  
-  renderImage = () => {
-    if (!this.props.article.img) return null;
-
-    return (
-      <ArticleImage src={this.props.article.img} alt={this.props.article.title}/>
-    )
-  }
 
   formatTitle = (): string => {
     // If titles is > MAX_TITLE_LEN, clip text with ellipsis 
@@ -74,23 +88,23 @@ export class Article extends Component<ArticleProps, {}> {
   }
 
   formatCoordinates = (): string => {
-    const lat = this.props.article.lat.toFixed(3)
-    const lng = this.props.article.lng.toFixed(3)
+    const lat = this.props.article.lat.toFixed(5)
+    const lng = this.props.article.lng.toFixed(5)
 
     return 'Lat: ' + lat + ' | Lng: ' + lng
   }
   
   render() {
     return (
-      <div>
-        <ArticleContainer>
-          <LeftAlignDiv>
-            <ArticleTitle>{this.formatTitle()}</ArticleTitle>
-            {/* <ArticleImageContainer>{this.renderImage()}</ArticleImageContainer> */}
-          </LeftAlignDiv>
-          <ArticleCoordinates>{this.formatCoordinates()}</ArticleCoordinates>
-        </ArticleContainer>
-      </div>
+      <ArticleContainer>
+        <div>
+          <ArticleTitle href={this.props.article.link}>{this.formatTitle()}</ArticleTitle>
+        </div>
+        <ArticleCoordinates>{this.formatCoordinates()}</ArticleCoordinates>
+        <OptionsContainer>
+          <Option>&#8592; Find on Map</Option>
+        </OptionsContainer>
+      </ArticleContainer>
     )
   }
 }

@@ -179,15 +179,13 @@ class ArticleList extends Component<Props, State> {
           )
         }
       });
+    } else if (this.props.fetchingArticles) {
+      return (
+        <div className="spinner-border slow" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      )
     }
-    // } else if (this.props.fetchingArticles) {
-    //   console.log(this.props.fetchingArticles)
-    //   return (
-    //     <div className="spinner-border slow" role="status">
-    //       <span className="sr-only">Loading...</span>
-    //     </div>
-    //   )
-    // }
 
     return renderFragment;
   }
