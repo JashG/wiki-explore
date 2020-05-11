@@ -6,3 +6,6 @@ temp/
 
 # development config
 webpack.config.js
+
+# credentials
+src/credentials.js

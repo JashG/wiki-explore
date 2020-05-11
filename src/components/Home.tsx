@@ -33,21 +33,6 @@ interface HomeDispatchProps {
 type HomeProps = HomeReduxProps & HomeDispatchProps & HomeOwnProps
 
 class Home extends Component<HomeProps, {}> {
-  
-  componentDidMount() {
-    // get user's current location
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(position => {
-        console.log(position)
-        const coords: Coordinates = {
-          lat: position.coords.latitude, 
-          lng: position.coords.longitude
-        };
-
-        this.props.setCoordinatesAction(coords);
-      });
-    }
-  }
 
   render() {
     return(

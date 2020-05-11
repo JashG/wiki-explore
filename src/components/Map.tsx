@@ -4,13 +4,13 @@ import GoogleMapReact from 'google-map-react';
 import styled from 'styled-components';
 import { setCoordinates } from '../store/actions';
 import { Coordinates } from '../constants/types'
+import { key } from '../credentials';
 
 const defaultProps = {
-  center: {
+  coordinates: {
     lat: 39.7,
     lng: -75.8
-  },
-  zoom: 11
+  }
 }
 
 interface MapState {
@@ -42,10 +42,16 @@ const MapContainer = styled.div`
 class Map extends Component<MapProps, MapState> {
 
   componentDidMount() {
-    if (this.props.coordinates) {
-      if (this.props.coordinates.lat !== 0 && this.props.coordinates.lng !== 0) {
-        // console.log(this.props.coordinates)
-      }
+    // Fetch user's location
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const coords: Coordinates = {
+          lat: position.coords.latitude, 
+          lng: position.coords.longitude
+        };
+
+        this.props.setCoordinatesAction(coords);
+      });
     }
   }
 
@@ -55,6 +61,14 @@ class Map extends Component<MapProps, MapState> {
         // console.log(this.props.coordinates)
       }
     }
+  }
+
+  getDefaultCenter = () => {
+    if (this.props.coordinates.lat !== 0 && this.props.coordinates.lng !== 0) {
+      return this.props.coordinates
+    }
+
+    return defaultProps.coordinates
   }
 
   handleChangeInCenter = (map: any) => {
@@ -68,17 +82,17 @@ class Map extends Component<MapProps, MapState> {
     this.props.setCoordinatesAction(coords);
   }
 
-  generatePins = () => {
-    
+  renderMap = () => {
+
   }
 
   render() {
     return(
       <MapContainer>
         <GoogleMapReact
-          bootstrapURLKeys={{ key: '' }}
-          defaultCenter={defaultProps.center}
-          defaultZoom={defaultProps.zoom}
+          bootstrapURLKeys={{ key: key }}
+          defaultCenter={this.getDefaultCenter()}
+          defaultZoom={11}
           yesIWantToUseGoogleMapApiInternals
           onDragEnd={(map) => this.handleChangeInCenter(map)}
         />
