@@ -1,10 +1,29 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components'
-import { Article as ArticleType } from '../constants/types'
-import { LIGHT_GREY, SUBHEADING, PRIMARY_TEXT, PRIMARY_HOVER, SECONDARY_HOVER } from '../style/colors';
+import { Article as ArticleType, Coordinates } from '../constants/types'
+import { setArticleCoordinates } from '../store/actions';
+import { LIGHT_GREY, SUBHEADING, PRIMARY, PRIMARY_HOVER, BUTTON_HOVER } from '../style/colors';
 
 // Max length of an article title we will display before clipping
 const MAX_TITLE_LEN = 35
+
+// Define type of props from parent
+interface ArticleOwnProps {
+  article: ArticleType
+}
+
+// Define type of props we will pull from Redux store
+interface ArticleReduxProps {
+  articleCoordinates: Coordinates,
+}
+
+// Define type of functions used in 'mapDispatchToProps' function
+interface ArticleDispatchProps {
+  setArticleCoordinatesAction: (payload: Coordinates) => void,
+}
+
+type Props = ArticleOwnProps & ArticleReduxProps & ArticleDispatchProps;
 
 const ArticleContainer = styled.div`
   height: 70px;
@@ -13,10 +32,10 @@ const ArticleContainer = styled.div`
   flex-direction: column;
   border-bottom: solid 2px ${LIGHT_GREY};
   transition: 0.2s ease-in;
-  color: ${PRIMARY_TEXT};
+  color: ${PRIMARY};
 
   &:hover {
-    border-bottom: solid 2px ${PRIMARY_HOVER};
+    background-color: ${PRIMARY_HOVER};
   }
 `
 
@@ -61,12 +80,12 @@ const Option = styled.span`
   font-size: 14px;
   text-align: left;
   padding: 2px;
-  color: ${PRIMARY_TEXT};
+  color: ${PRIMARY};
   transition: 0.2s ease-in-out;
 
   &:hover {
     border-radius: 4px;
-    background: ${SECONDARY_HOVER};
+    background: ${BUTTON_HOVER};
     cursor: pointer;
   }
 
@@ -75,11 +94,7 @@ const Option = styled.span`
   }
 `
 
-interface ArticleProps {
-  article: ArticleType
-}
-
-export class Article extends Component<ArticleProps, {}> {
+class Article extends Component<Props, {}> {
 
   formatTitle = (): string => {
     // If titles is > MAX_TITLE_LEN, clip text with ellipsis 
@@ -93,6 +108,10 @@ export class Article extends Component<ArticleProps, {}> {
 
     return 'Lat: ' + lat + ' | Lng: ' + lng
   }
+
+  handleFindOnMap = () => {
+    this.props.setArticleCoordinatesAction({lat: this.props.article.lat, lng: this.props.article.lng})
+  }
   
   render() {
     return (
@@ -102,9 +121,24 @@ export class Article extends Component<ArticleProps, {}> {
         </div>
         <ArticleCoordinates>{this.formatCoordinates()}</ArticleCoordinates>
         <OptionsContainer>
-          <Option>&#8592; Find on Map</Option>
+          <Option onClick={this.handleFindOnMap}>&#8592; Find on Map</Option>
         </OptionsContainer>
       </ArticleContainer>
     )
   }
 }
+
+// Note: Type of 'state' should be interface for Redux state
+const mapStateToProps = (state: any, ownProps?: ArticleOwnProps): ArticleReduxProps => {
+  return {
+    articleCoordinates: state.articleCoordinates.coordinates,
+  }
+}
+
+const mapDispatchToProps = (dispatch: any, ownProps: ArticleOwnProps): ArticleDispatchProps => {
+  return {
+    setArticleCoordinatesAction: (payload: Coordinates) => dispatch(setArticleCoordinates(payload)),
+  }
+};
+
+export default connect<ArticleReduxProps, ArticleDispatchProps, ArticleOwnProps>(mapStateToProps, mapDispatchToProps)(Article);

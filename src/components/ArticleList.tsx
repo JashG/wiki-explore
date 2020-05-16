@@ -5,7 +5,7 @@ import { geosearch } from '../api/wiki/geosearch';
 import { articleData } from '../api/wiki/articleData';
 import { Article, ArticleFromResponse, Coordinates } from '../constants/types'
 import { setArticles, fetchArticles } from '../store/actions';
-import { Article as ArticleComponent } from '../components/Article';
+import ArticleComponent from '../components/Article';
 
 // Max page IDs that can be passed as param to articleData endpoint
 const MAX_PAGE_IDS = 50
@@ -54,9 +54,6 @@ class ArticleList extends Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    console.log("PREV: ")
-    console.log(prevProps)
-    console.log("CURR: ")
     console.log(this.props)
     if (prevProps.coordinates.lat !== this.props.coordinates.lat || prevProps.coordinates.lng !== this.props.coordinates.lng) {
       this.handleGeosearch();
@@ -133,7 +130,6 @@ class ArticleList extends Component<Props, State> {
     }
 
     this.articleData(params).then(response => {
-      console.log(response)
       if (response && response.data && response.data.query) {
         if (response.data.query.pages) {
           // Get article data from response
