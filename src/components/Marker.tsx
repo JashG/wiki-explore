@@ -6,12 +6,18 @@ import { PRIMARY, BUTTON_HOVER } from '../style/colors';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-type Props = {
+interface MarkerProps {
   article: ArticleType,
-  coordinates: Coordinates,
   isSelected?: boolean,
   onClick?: any, // callback function for when marker is clicked. Not yet sure how to type this. 
 }
+
+interface OuterProps {
+  lat: number,
+  lng: number,
+}
+
+type Props = MarkerProps & OuterProps;
 
 type CircleProps = {
   isSelected?: boolean
@@ -53,7 +59,7 @@ export default class Marker extends Component<Props, {}> {
           effect='solid'
           place={'right'}
           border={true}
-          globalEventOff={'click'} // toggles tooltip away on click
+          // globalEventOff={'click'} // toggles tooltip away on click
           backgroundColor={PRIMARY}
         />
       </div>

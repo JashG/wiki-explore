@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import GoogleMapReact from 'google-map-react';
 import styled from 'styled-components';
-import { setCoordinates } from '../store/actions';
-import { Coordinates } from '../constants/types'
+import { setCoordinates, setArticleCoordinates } from '../store/actions';
+import { Article, Coordinates } from '../constants/types'
+import Marker from '../components/Marker';
 import { key } from '../credentials';
 
 const defaultProps = {
@@ -24,12 +25,15 @@ interface MapOwnProps {
 
 // Define type of data used in 'mapStateToProps' function
 interface MapReduxProps {
-  coordinates: Coordinates
+  coordinates: Coordinates,
+  articles: Article[],
+  fetchingArticles: boolean,
 }
 
 // Define type of functions used in 'mapDispatchToProps' function
 interface MapDispatchProps {
   setCoordinatesAction: (payload: Coordinates) => void,
+  setArticleCoordinatesAction: (payload: Coordinates) => void,
 }
 
 type MapProps = MapReduxProps & MapDispatchProps & MapOwnProps
@@ -82,8 +86,28 @@ class Map extends Component<MapProps, MapState> {
     this.props.setCoordinatesAction(coords);
   }
 
-  renderMap = () => {
+  renderMarkers = () => {
+    const { articles, fetchingArticles } = this.props;
 
+    // We will store each Marker here
+    const renderFragment: JSX.Element[] = [];
+
+    if (!fetchingArticles && articles) {
+      articles.forEach(article => {
+        if (article) {
+          renderFragment.push(
+            <Marker
+              key={article.id}
+              article={article}
+              lat={article.lat}
+              lng={article.lng}
+            />
+          )
+        }
+      });
+    }
+
+    return renderFragment;
   }
 
   render() {
@@ -92,10 +116,12 @@ class Map extends Component<MapProps, MapState> {
         <GoogleMapReact
           bootstrapURLKeys={{ key: key }}
           defaultCenter={this.getDefaultCenter()}
-          defaultZoom={11}
+          defaultZoom={12}
           yesIWantToUseGoogleMapApiInternals
           onDragEnd={(map) => this.handleChangeInCenter(map)}
-        />
+        >
+          {this.renderMarkers()}
+        </GoogleMapReact>
       </MapContainer>
     )
   }
@@ -103,13 +129,16 @@ class Map extends Component<MapProps, MapState> {
 
 const mapStateToProps = (state: any, ownProps?: MapOwnProps) => {
   return {
-    coordinates: state.coordinates.coordinates
+    coordinates: state.coordinates.coordinates,
+    articles: state.articles.articles,
+    fetchingArticles: state.articles.fetchingArticles,
   }
 }
 
 const mapDispatchToProps = (dispatch: any, ownProps: MapOwnProps): MapDispatchProps => {
   return {
-    setCoordinatesAction: (payload: Coordinates) => dispatch(setCoordinates(payload))
+    setCoordinatesAction: (payload: Coordinates) => dispatch(setCoordinates(payload)),
+    setArticleCoordinatesAction: (payload: Coordinates) => dispatch(setArticleCoordinates(payload)),
   }
 };
 

@@ -54,7 +54,6 @@ class ArticleList extends Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    console.log(this.props)
     if (prevProps.coordinates.lat !== this.props.coordinates.lat || prevProps.coordinates.lng !== this.props.coordinates.lng) {
       this.handleGeosearch();
     }
