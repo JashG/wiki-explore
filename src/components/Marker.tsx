@@ -1,19 +1,28 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import ReactTooltip from 'react-tooltip';
+import { Article as ArticleType, Coordinates } from '../constants/types'
 import { PRIMARY, BUTTON_HOVER } from '../style/colors';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 type Props = {
-  lat: number,
-  lng: number,
+  article: ArticleType,
+  coordinates: Coordinates,
+  isSelected?: boolean,
+  onClick?: any, // callback function for when marker is clicked. Not yet sure how to type this. 
+}
+
+type CircleProps = {
+  isSelected?: boolean
 }
 
 const Circle = styled.div`
   height: 20px;
   width: 20px;
   border-radius: 14px;
-  border: 4px solid ${PRIMARY};
+  border: 4px solid;
+  border-color: ${(props: CircleProps) => (props.isSelected ? BUTTON_HOVER : 'transparent')};
   background: ${PRIMARY};
 
   &:hover {
@@ -24,13 +33,30 @@ const Circle = styled.div`
 
 export default class Marker extends Component<Props, {}> {
 
-  handleClick = () => {
-    // stuff
+  getHoverTooltipContent = (dataTip: any) => {
+    const { article } = this.props;
+
+    return (
+      <div>
+        {article ? article.title : 'No title'}
+      </div>
+    )
   }
 
   render() {
     return (
-      <Circle onClick={this.handleClick}/>
+      <div>
+        <Circle data-tip='' 
+          isSelected={this.props.isSelected}
+          onClick={this.props.onClick} />
+        <ReactTooltip getContent={this.getHoverTooltipContent}
+          effect='solid'
+          place={'right'}
+          border={true}
+          globalEventOff={'click'} // toggles tooltip away on click
+          backgroundColor={PRIMARY}
+        />
+      </div>
     )
   }
 

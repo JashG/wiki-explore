@@ -2,9 +2,9 @@
  * Theme colors
  */
 const BISCAY = '#303952';
+const DARK_GREY = '#adadad';
 const MINT_CREAM = '#F3F8F2';
 const ORANGE = '#ffc5a1';
-const DARK_GREY = '#adadad';
 
 /**
  * Colors for specific page elements

@@ -68,14 +68,6 @@ const ArticleCoordinates = styled.span`
   }
 `
 
-const OptionsContainer = styled.div`
-  padding-top: 6px;
-
-  &:hover {
-    
-  }
-`
-
 const Option = styled.span`
   font-size: 14px;
   text-align: left;
@@ -103,13 +95,13 @@ class Article extends Component<Props, {}> {
   }
 
   formatCoordinates = (): string => {
-    const lat = this.props.article.lat.toFixed(5)
-    const lng = this.props.article.lng.toFixed(5)
+    const lat = this.props.article.lat.toFixed(5);
+    const lng = this.props.article.lng.toFixed(5);
 
-    return 'Lat: ' + lat + ' | Lng: ' + lng
+    return 'Lat: ' + lat + ' | Lng: ' + lng;
   }
 
-  handleFindOnMap = () => {
+  setActiveArticle = () => {
     this.props.setArticleCoordinatesAction({lat: this.props.article.lat, lng: this.props.article.lng})
   }
   
@@ -120,9 +112,9 @@ class Article extends Component<Props, {}> {
           <ArticleTitle href={this.props.article.link}>{this.formatTitle()}</ArticleTitle>
         </div>
         <ArticleCoordinates>{this.formatCoordinates()}</ArticleCoordinates>
-        <OptionsContainer>
-          <Option onClick={this.handleFindOnMap}>&#8592; Find on Map</Option>
-        </OptionsContainer>
+        <div>
+          <Option onClick={this.setActiveArticle}>&#8592; Find on Map</Option>
+        </div>
       </ArticleContainer>
     )
   }
