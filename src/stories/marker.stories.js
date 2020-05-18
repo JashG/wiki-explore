@@ -6,5 +6,7 @@ export default { title: 'Marker' }
 // const markerProps = {}
 
 export const marker = () => (
-  <Marker></Marker>
+  <div style={{padding: '10px'}}>
+    <Marker></Marker>
+  </div>
 )

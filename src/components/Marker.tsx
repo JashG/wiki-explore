@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import ReactTooltip from 'react-tooltip';
-import { Article as ArticleType, Coordinates } from '../constants/types'
+import { Article as ArticleType } from '../constants/types'
 import { PRIMARY, BUTTON_HOVER } from '../style/colors';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -28,8 +28,20 @@ const Circle = styled.div`
   width: 20px;
   border-radius: 14px;
   border: 4px solid;
-  border-color: ${(props: CircleProps) => (props.isSelected ? BUTTON_HOVER : 'transparent')};
+  border-color: ${(props: CircleProps) => (props.isSelected ? BUTTON_HOVER : PRIMARY + '50')};
   background: ${PRIMARY};
+
+  -moz-background-clip: border;
+  -webkit-background-clip: border;
+  background-clip: border-box;
+				
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding;
+  background-clip: padding-box;
+				
+  -moz-background-clip: content;
+  -webkit-background-clip: content;
+  background-clip: content-box;
 
   &:hover {
     cursor: pointer;
@@ -50,11 +62,13 @@ export default class Marker extends Component<Props, {}> {
   }
 
   render() {
+    const { onClick } = this.props;
+
     return (
       <div>
         <Circle data-tip='' 
           isSelected={this.props.isSelected}
-          onClick={this.props.onClick} />
+          onClick={onClick ? onClick(this.props.article) : undefined} />
         <ReactTooltip getContent={this.getHoverTooltipContent}
           effect='solid'
           place={'right'}

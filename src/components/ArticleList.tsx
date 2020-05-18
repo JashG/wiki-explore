@@ -48,6 +48,8 @@ class ArticleList extends Component<Props, State> {
   componentDidMount() {
     if (this.props.coordinates && this.props.coordinates.lat && this.props.coordinates.lng) {
       if (this.props.coordinates.lat !== 0 && this.props.coordinates.lng !== 0) {
+        console.log("GEOSEARCH!")
+        console.log(this.props)
         this.handleGeosearch();
       }
     }
@@ -55,6 +57,9 @@ class ArticleList extends Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.coordinates.lat !== this.props.coordinates.lat || prevProps.coordinates.lng !== this.props.coordinates.lng) {
+      console.log("GEOSEARCH!")
+      console.log(prevProps)
+      console.log(this.props)
       this.handleGeosearch();
     }
   }
@@ -102,19 +107,21 @@ class ArticleList extends Component<Props, State> {
     }
 
     // Get article data in parallel
-    const apiCalls = articleChunks.map(async (chunk) => await this.getArticleData(chunk));
-    const results = await Promise.all(apiCalls);
+    const apiCalls = articleChunks.map(chunk => this.getArticleData(chunk));
+    // Used to store article data we retrieved in redux
+    let articleData: Article[] = []
+    Promise.all(apiCalls).then((responses: Article[][]) => {
+      // responses is an array of arrays of article data retrieved from each parallel call
+      // Concat those into a single array and store in redux
+      responses.forEach(articleList => {
+        articleData = articleData.concat(articleList);
+      });
 
-    // Store article data we retrieved in redux
-    const articleData: Article[] = []
-    results.forEach((result: any) => {
-      articleData.push(result);
+      this.props.setArticlesAction(articleData);
     });
-
-    this.props.setArticlesAction(articleData);
   }
 
-  getArticleData = (articles: ArticleFromResponse[]) => {
+  getArticleData = async (articles: ArticleFromResponse[]) => {
     // Array of articles we will store in redux
     const data: Article[] = [];
 
@@ -128,7 +135,7 @@ class ArticleList extends Component<Props, State> {
       piprop: 'original'
     }
 
-    this.articleData(params).then(response => {
+    return this.articleData(params).then(response => {
       if (response && response.data && response.data.query) {
         if (response.data.query.pages) {
           // Get article data from response
@@ -154,10 +161,10 @@ class ArticleList extends Component<Props, State> {
         }
       }
     }).then(onfulfilled => {
-      this.props.setArticlesAction(data);
+      return Promise.resolve(data);
     }).catch(error => {
       console.log(error)
-      this.props.setArticlesAction([]);
+      return Promise.resolve(data);
     });
   }
 

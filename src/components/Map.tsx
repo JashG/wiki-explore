@@ -28,6 +28,7 @@ interface MapReduxProps {
   coordinates: Coordinates,
   articles: Article[],
   fetchingArticles: boolean,
+  articleCoordinates: Coordinates,
 }
 
 // Define type of functions used in 'mapDispatchToProps' function
@@ -86,8 +87,17 @@ class Map extends Component<MapProps, MapState> {
     this.props.setCoordinatesAction(coords);
   }
 
+  setSelectedArticle = (article: Article) => {
+    // Not sure why, but have to explicitly make these variables and then create coords obj
+    const lat = article.lat;
+    const lng = article.lng;
+    const coords: Coordinates = {lat, lng};
+
+    this.props.setArticleCoordinatesAction(coords);
+  }
+
   renderMarkers = () => {
-    const { articles, fetchingArticles } = this.props;
+    const { articles, fetchingArticles, articleCoordinates } = this.props;
 
     // We will store each Marker here
     const renderFragment: JSX.Element[] = [];
@@ -99,6 +109,8 @@ class Map extends Component<MapProps, MapState> {
             <Marker
               key={article.id}
               article={article}
+              isSelected={articleCoordinates.lat === article.lat && articleCoordinates.lng === article.lng}
+              onClick={this.setSelectedArticle}
               lat={article.lat}
               lng={article.lng}
             />
@@ -132,6 +144,7 @@ const mapStateToProps = (state: any, ownProps?: MapOwnProps) => {
     coordinates: state.coordinates.coordinates,
     articles: state.articles.articles,
     fetchingArticles: state.articles.fetchingArticles,
+    articleCoordinates: state.articleCoordinates.articleCoordinates,
   }
 }
 

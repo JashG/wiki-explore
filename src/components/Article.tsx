@@ -43,9 +43,11 @@ const ArticleTitle = styled.a`
   text-align: left;
   padding-top: 10px;
   font-size: 18px;
+  color: inherit;
   text-decoration: none;
 
   &:hover {
+    color: inherit;
     text-decoration: underline;
   }
 

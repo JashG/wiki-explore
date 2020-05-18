@@ -20,7 +20,8 @@ function articleReducer(state = initialStateArticle, action: { type: string; pay
     case FETCH_ARTICLES:
       return {
         ...state,
-        fetchingArticles: true
+        fetchingArticles: true,
+        articles: []
       }
 
     case SET_ARTICLES:
